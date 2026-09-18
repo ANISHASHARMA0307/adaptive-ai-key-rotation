@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Risk-Aware Key Rotation{% endblock %}</title>
+  <link rel="stylesheet" href="/static/style.css?v=3">
+</head>
+<body>
+  <nav class="navbar">
+    <div class="nav-brand">
+      <span class="brand-mark">&#128274;</span> Adaptive Key Rotation
+    </div>
+    {% if user %}
+    <div class="nav-links">
+      <a href="/dashboard">Dashboard</a>
+      <a href="/activity">Activity</a>
+      <a href="/upload">Upload</a>
+      <span class="nav-user">{{ user.username }}</span>
+      <a href="/logout" class="nav-logout">Logout</a>
+    </div>
+    {% endif %}
+  </nav>
+  <main class="container">
+    {% block content %}{% endblock %}
+  </main>
+</body>
+</html>

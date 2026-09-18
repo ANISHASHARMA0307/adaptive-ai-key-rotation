@@ -1,0 +1,23 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+env/
+.venv/
+
+# App runtime data — NEVER commit these (secrets + user data)
+app.db
+keys/*.key
+encrypted/*.enc
+uploads/*
+!uploads/.gitkeep
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
+
+# ML model artifact is kept intentionally so the repo works out of the box.
+# If you'd rather regenerate it via `python -m ai.train_model`, uncomment:
+# ai/model/*.joblib

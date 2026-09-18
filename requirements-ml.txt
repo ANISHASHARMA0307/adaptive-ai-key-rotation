@@ -1,0 +1,8 @@
+# Optional — only needed to train/run the ML (Random Forest) risk engine.
+# Without these, the app automatically falls back to the rule-based engine.
+# No upper version pins here on purpose: numpy/scikit-learn wheel support
+# for brand-new Python versions lags behind release, so let pip pick the
+# newest compatible build instead of a stale pin that has no wheel yet.
+numpy>=2.1
+scikit-learn>=1.5
+joblib>=1.4
