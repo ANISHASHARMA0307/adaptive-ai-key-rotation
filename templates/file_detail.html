@@ -126,6 +126,12 @@ endblock %} {% block content %}
         <td>Unusual Time Risk</td>
         <td>+{{ "%.0f"|format(breakdown.time_risk) }}</td>
       </tr>
+      {% if breakdown.rotation_mitigation > 0 %}
+      <tr>
+        <td>Rotation Mitigation</td>
+        <td style="color: var(--green)">-{{ "%.0f"|format(breakdown.rotation_mitigation) }}</td>
+      </tr>
+      {% endif %}
       <tr class="total-row">
         <td>{{ "ML Predicted Total" if engine_status.is_ml else "Total" }}</td>
         <td>{{ "%.0f"|format(breakdown.total) }}</td>
@@ -142,6 +148,8 @@ endblock %} {% block content %}
       Threshold: {{ breakdown.threshold }} &mdash; {% if
       breakdown.rotation_required %}
       <strong class="text-high">ROTATION REQUIRED</strong>
+      {% elif file.active_key_version > 1 and breakdown.total > breakdown.threshold %}
+      <strong class="text-low" style="color: var(--cyan)">ROTATED (v{{ file.active_key_version }} active &mdash; monitoring)</strong>
       {% else %}
       <strong class="text-low">key within safe range</strong>
       {% endif %}
@@ -260,5 +268,32 @@ endblock %} {% block content %}
     </table>
   </div>
 </section>
+
+<script>
+  // Live synchronization: Polls read-only file status so the UI automatically
+  // reflects background scheduler key rotation without requiring manual browser refresh.
+  const currentKeyVersion = {{ file.active_key_version }};
+  const fileId = {{ file.id }};
+  let isChecking = false;
+
+  setInterval(async () => {
+    if (isChecking) return;
+    isChecking = true;
+    try {
+      const res = await fetch(`/api/file/${fileId}/status`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.active_key_version && data.active_key_version !== currentKeyVersion) {
+          // Active key version updated by background scheduler!
+          window.location.reload();
+        }
+      }
+    } catch (e) {
+      // Silent catch for background polling
+    } finally {
+      isChecking = false;
+    }
+  }, 3000);
+</script>
 
 {% endblock %}

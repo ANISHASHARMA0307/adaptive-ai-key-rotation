@@ -44,6 +44,8 @@ RISK_WEIGHTS = {
 # session secret (demo only — in production load from env/secret manager)
 SESSION_SECRET = os.environ.get("APP_SESSION_SECRET", "dev-secret-change-me-in-production")
 
-# Demo mode: if True, the file-detail page is allowed to show truncated key
-# material for educational/evaluation purposes. Production UIs should NOT do this.
-DEMO_MODE_SHOW_KEY_EVIDENCE = True
+# Background monitoring interval (in seconds)
+MONITORING_INTERVAL_SECONDS = 30
+
+# Demo mode: Production and security requirements forbid exposing secret key material.
+DEMO_MODE_SHOW_KEY_EVIDENCE = False

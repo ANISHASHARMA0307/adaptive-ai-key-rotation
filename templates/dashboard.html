@@ -23,7 +23,11 @@ block content %}
 
   <div class="summary-card">
     <span class="summary-label">ML Risk Monitoring</span>
-    <strong class="summary-status">ACTIVE</strong>
+    {% if engine_status.is_ml %}
+    <strong class="summary-status" style="color: var(--green)">ACTIVE (Random Forest)</strong>
+    {% else %}
+    <strong class="summary-status" style="color: var(--amber)">RULE-BASED (Fallback)</strong>
+    {% endif %}
   </div>
 
   <div class="summary-card">
@@ -118,4 +122,23 @@ block content %}
   </div>
   {% endfor %}
 </div>
-{% endif %} {% endblock %}
+{% endif %}
+
+<script>
+  // Periodically check dashboard status to reflect background scheduler updates automatically
+  let lastDashboardState = null;
+  setInterval(async () => {
+    try {
+      const res = await fetch('/api/dashboard/status');
+      if (res.ok) {
+        const data = await res.json();
+        const stateKey = JSON.stringify(data.files);
+        if (lastDashboardState !== null && lastDashboardState !== stateKey) {
+          window.location.reload();
+        }
+        lastDashboardState = stateKey;
+      }
+    } catch (e) {}
+  }, 4000);
+</script>
+{% endblock %}
