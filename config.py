@@ -14,7 +14,14 @@ LOGS_DIR = os.path.join(BASE_DIR, "logs")
 for d in (UPLOAD_DIR, ENCRYPTED_DIR, KEYS_DIR, LOGS_DIR):
     os.makedirs(d, exist_ok=True)
 
-DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'app.db')}"
+_env_db = os.environ.get("DATABASE_URL")
+if _env_db:
+    if _env_db.startswith("postgres://"):
+        DATABASE_URL = _env_db.replace("postgres://", "postgresql://", 1)
+    else:
+        DATABASE_URL = _env_db
+else:
+    DATABASE_URL = f"sqlite:///{os.path.join(BASE_DIR, 'app.db')}"
 
 # --- Crypto ---
 KEY_SIZE = 32       # 256-bit key

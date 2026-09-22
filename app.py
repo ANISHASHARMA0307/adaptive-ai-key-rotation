@@ -515,5 +515,5 @@ if __name__ == "__main__":
     import uvicorn
     # reload=False ensures a single scheduler process and avoids watcher loops on file uploads/key generation
     port = int(os.environ.get("PORT", 8000))
-    host = os.environ.get("HOST", "127.0.0.1")
+    host = os.environ.get("HOST", "0.0.0.0")
     uvicorn.run(app, host=host, port=port)
