@@ -142,18 +142,6 @@
         {% endif %}
       </div>
 
-      <!-- Explanations Chips -->
-      <h3 style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--gd-text-muted); letter-spacing: 0.4px; margin-bottom: 10px;">Security Evaluation Context</h3>
-      <div class="gd-chip-list">
-        {% for exp in breakdown.explanations %}
-        <div class="gd-chip">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--gd-primary);">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          {{ exp }}
-        </div>
-        {% endfor %}
-      </div>
 
       <!-- Feature Breakdown Table -->
       <h3 style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--gd-text-muted); letter-spacing: 0.4px; margin-bottom: 10px;">Feature Input Breakdown</h3>
@@ -203,37 +191,6 @@
       </table>
     </section>
 
-    <!-- Model Insights Card (if ML) -->
-    {% if engine_status.is_ml and feature_importances %}
-    <section class="gd-card">
-      <div class="gd-card-header">
-        <h2 class="gd-card-title">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--gd-primary);">
-            <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
-            <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
-          </svg>
-          ML Feature Weights &amp; Importance
-        </h2>
-        <span style="font-size: 12px; color: var(--gd-text-muted);">
-          {{ model_info.n_samples }} samples &middot; MAE {{ model_info.mae }} &middot; R&sup2; {{ model_info.r2 }}
-        </span>
-      </div>
-
-      <div style="display: flex; flex-direction: column; gap: 12px;">
-        {% for name, importance in feature_importances %}
-        <div>
-          <div style="display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 4px;">
-            <span style="color: var(--gd-text-secondary); text-transform: capitalize;">{{ name.replace('_', ' ') }}</span>
-            <span style="font-weight: 600; color: var(--gd-text);">{{ (importance * 100)|round(1) }}%</span>
-          </div>
-          <div class="gd-bar-track">
-            <div class="gd-bar-fill" style="width: {{ (importance * 100)|round(1) }}%;"></div>
-          </div>
-        </div>
-        {% endfor %}
-      </div>
-    </section>
-    {% endif %}
 
     <!-- Encryption Metadata Card -->
     <section class="gd-card">
