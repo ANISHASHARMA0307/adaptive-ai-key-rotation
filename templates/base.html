@@ -23,6 +23,7 @@
       </div>
     </a>
 
+    {% if user %}
     <!-- Omni Search Bar -->
     <div class="gd-search-bar">
       <div class="gd-search-input-wrapper">
@@ -35,6 +36,7 @@
         <input type="text" id="gdOmniSearch" class="gd-search-input" placeholder="Search encrypted files, key versions, and security logs..." autocomplete="off">
       </div>
     </div>
+    {% endif %}
 
     <!-- Right Header Profile & Controls -->
     <div class="gd-header-right">
@@ -132,6 +134,7 @@
     </main>
   </div>
 
+  {% if user %}
   <!-- Live Client-Side Search Filter -->
   <script>
     document.addEventListener("DOMContentLoaded", () => {
@@ -148,5 +151,6 @@
       }
     });
   </script>
+  {% endif %}
 </body>
 </html>
