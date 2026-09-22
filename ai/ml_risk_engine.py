@@ -126,12 +126,21 @@ class MLRiskEngine:
             explanations.append("Standard risk factors")
         # Reference sub-factors (for the "model inputs" panel in the UI)
         type_level = file_type_risk_level(file_record.file_type)
+        raw_encryption = 8.0
+        raw_file_type = type_level * 10.0
+        raw_file_size = file_size_risk
+        raw_age = age_risk
+        raw_key_age = key_age_risk
+        
+        raw_total = raw_encryption + raw_file_type + raw_file_size + raw_age + raw_key_age
+        scale = predicted / raw_total if raw_total > 0 else 0.0
+        
         breakdown = RiskBreakdown(
-            encryption_risk=8.0,
-            file_type_risk=type_level * 10.0,
-            file_size_risk=file_size_risk,
-            age_risk=age_risk,
-            key_age_risk=key_age_risk,
+            encryption_risk=raw_encryption * scale,
+            file_type_risk=raw_file_type * scale,
+            file_size_risk=raw_file_size * scale,
+            age_risk=raw_age * scale,
+            key_age_risk=raw_key_age * scale,
             rotation_mitigation=rotation_mitigation,
             total=adjusted_predicted,
             level=level,
