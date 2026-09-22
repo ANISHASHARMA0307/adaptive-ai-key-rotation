@@ -156,12 +156,16 @@
             <td style="text-align: right; font-weight: 500;">+{{ "%.0f"|format(breakdown.file_type_risk) }}</td>
           </tr>
           <tr>
+            <td>Data Volume Exposure ({{ (file.file_size / 1024)|round|int }} KB)</td>
+            <td style="text-align: right; font-weight: 500;">+{{ "%.1f"|format(breakdown.file_size_risk) }}</td>
+          </tr>
+          <tr>
             <td>File Age Risk</td>
-            <td style="text-align: right; font-weight: 500;">+{{ "%.0f"|format(breakdown.age_risk) }}</td>
+            <td style="text-align: right; font-weight: 500;">+{{ "%.1f"|format(breakdown.age_risk) }}</td>
           </tr>
           <tr>
             <td>Key Age Risk</td>
-            <td style="text-align: right; font-weight: 500;">+{{ "%.0f"|format(breakdown.key_age_risk) }}</td>
+            <td style="text-align: right; font-weight: 500;">+{{ "%.1f"|format(breakdown.key_age_risk) }}</td>
           </tr>
           <tr>
             <td>Access Frequency Risk</td>

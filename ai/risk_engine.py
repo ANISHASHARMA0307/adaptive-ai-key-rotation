@@ -26,6 +26,7 @@ MEDIUM_RISK_EXTENSIONS = {"docx", "xlsx", "pdf", "pptx", "csv"}
 class RiskBreakdown:
     encryption_risk: float = 0.0
     file_type_risk: float = 0.0
+    file_size_risk: float = 0.0
     age_risk: float = 0.0
     key_age_risk: float = 0.0
     access_risk: float = 0.0
@@ -43,6 +44,7 @@ class RiskBreakdown:
         return {
             "encryption_risk": round(self.encryption_risk, 2),
             "file_type_risk": round(self.file_type_risk, 2),
+            "file_size_risk": round(self.file_size_risk, 2),
             "age_risk": round(self.age_risk, 2),
             "key_age_risk": round(self.key_age_risk, 2),
             "access_risk": round(self.access_risk, 2),
@@ -95,43 +97,54 @@ class RuleBasedRiskEngine:
         if bucket == "high":
             explanations.append("Sensitive file type accessed")
 
-        # 3. File age risk — older files have had more time to be discovered/targeted.
-        file_age_days = (now - file_record.created_at).days if file_record.created_at else 0
-        age_risk = min(file_age_days * w["age_risk_per_day"], w["age_risk_cap"])
+        # 3. File size & data volume exposure — larger files represent greater confidential exposure
+        file_size_kb = (file_record.file_size or 0) / 1024.0
+        file_size_risk = min(10.0, round(3.0 + min(file_size_kb / 1500.0, 7.0), 1))
 
-        # 4. Key age risk
-        key_age_days = 0
-        if key_record is not None and key_record.created_at:
-            key_age_days = (now - key_record.created_at).days
-        key_age_risk = min(key_age_days * w["key_age_risk_per_day"], w["key_age_risk_cap"])
+        # 4. Dynamic File age risk — scales continuously in real-time by hours and days
+        file_age_seconds = (now - file_record.created_at).total_seconds() if file_record.created_at else 0.0
+        file_age_hours = max(0.0, file_age_seconds / 3600.0)
+        file_age_days = file_age_seconds / 86400.0
+        if file_age_hours < 24.0:
+            age_risk = min(w["age_risk_cap"], round(0.5 + file_age_hours * 0.15, 1))
+        else:
+            age_risk = min(w["age_risk_cap"], round(file_age_days * w["age_risk_per_day"], 1))
 
-        # 5. Access risk
+        # 5. Dynamic Key age risk — key exposure scales continuously in real-time
+        key_age_seconds = (now - key_record.created_at).total_seconds() if (key_record and key_record.created_at) else 0.0
+        key_age_hours = max(0.0, key_age_seconds / 3600.0)
+        key_age_days = key_age_seconds / 86400.0
+        if key_age_hours < 24.0:
+            key_age_risk = min(w["key_age_risk_cap"], round(0.5 + key_age_hours * 0.2, 1))
+        else:
+            key_age_risk = min(w["key_age_risk_cap"], round(key_age_days * w["key_age_risk_per_day"], 1))
+
+        # 6. Access risk
         download_count = file_record.download_count or 0
         access_risk = min(download_count * w["access_risk_per_download"], w["access_risk_cap"])
         if download_count > 5:
             explanations.append("High file access frequency")
 
-        # 6. Failed login attempts
+        # 7. Failed login attempts
         failed_logins = file_record.owner.failed_login_attempts if file_record.owner else 0
         failed_login_risk = min(failed_logins * 10.0, 30.0)
         if failed_logins > 0:
             explanations.append("Multiple failed logins detected on owner account")
 
-        # 7. Unusual access time (e.g., outside 6 AM - 11 PM local time)
+        # 8. Unusual access time (e.g., outside 6 AM - 11 PM local time)
         local_hour = datetime.datetime.now().hour
         time_risk = 0.0
         if local_hour < 6 or local_hour >= 23:
             time_risk = 15.0
             explanations.append("Unusual access time (outside business hours)")
 
-        # 8. Cryptographic Rotation Mitigation
+        # 9. Cryptographic Rotation Mitigation
         rotation_mitigation = 0.0
         if key_record is not None and getattr(key_record, "version", 1) > 1:
-            key_age_days = (now - key_record.created_at).days if key_record.created_at else 0
             rotation_mitigation = max(0.0, 15.0 - (key_age_days * 1.5))
             explanations.append(f"Key rotated to v{key_record.version}: threat mitigated (-{rotation_mitigation:.0f} risk)")
 
-        total = encryption_risk + file_type_risk + age_risk + key_age_risk + access_risk + failed_login_risk + time_risk - rotation_mitigation
+        total = encryption_risk + file_type_risk + file_size_risk + age_risk + key_age_risk + access_risk + failed_login_risk + time_risk - rotation_mitigation
         total = max(0.0, min(total, 100.0))
 
         level = _level_for(total)
@@ -147,6 +160,7 @@ class RuleBasedRiskEngine:
         breakdown = RiskBreakdown(
             encryption_risk=encryption_risk,
             file_type_risk=file_type_risk,
+            file_size_risk=file_size_risk,
             age_risk=age_risk,
             key_age_risk=key_age_risk,
             access_risk=access_risk,

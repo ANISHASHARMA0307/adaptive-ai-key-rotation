@@ -63,10 +63,27 @@ class MLRiskEngine:
     def score(self, file_record, key_record) -> RiskBreakdown:
         now = datetime.datetime.now()
 
-        file_age_days = (now - file_record.created_at).days if file_record.created_at else 0
-        key_age_days = (now - key_record.created_at).days if (key_record and key_record.created_at) else 0
+        file_age_seconds = (now - file_record.created_at).total_seconds() if file_record.created_at else 0.0
+        file_age_hours = max(0.0, file_age_seconds / 3600.0)
+        file_age_days = file_age_seconds / 86400.0
+
+        key_age_seconds = (now - key_record.created_at).total_seconds() if (key_record and key_record.created_at) else 0.0
+        key_age_hours = max(0.0, key_age_seconds / 3600.0)
+        key_age_days = key_age_seconds / 86400.0
+
         download_count = file_record.download_count or 0
         file_size_kb = (file_record.file_size or 0) / 1024.0
+        file_size_risk = min(10.0, round(3.0 + min(file_size_kb / 1500.0, 7.0), 1))
+
+        if file_age_hours < 24.0:
+            age_risk = min(25.0, round(0.5 + file_age_hours * 0.15, 1))
+        else:
+            age_risk = min(25.0, round(file_age_days * 1.0, 1))
+
+        if key_age_hours < 24.0:
+            key_age_risk = min(30.0, round(0.5 + key_age_hours * 0.2, 1))
+        else:
+            key_age_risk = min(30.0, round(key_age_days * 1.5, 1))
 
         features = build_feature_vector(
             file_age_days=file_age_days,
@@ -131,8 +148,9 @@ class MLRiskEngine:
         breakdown = RiskBreakdown(
             encryption_risk=8.0,
             file_type_risk=type_level * 10.0,
-            age_risk=min(file_age_days * 1.0, 25.0),
-            key_age_risk=min(key_age_days * 1.5, 30.0),
+            file_size_risk=file_size_risk,
+            age_risk=age_risk,
+            key_age_risk=key_age_risk,
             access_risk=min(download_count * 3.0, 15.0),
             failed_login_risk=failed_login_risk,
             time_risk=time_risk,
