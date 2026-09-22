@@ -1,19 +1,32 @@
 # Adaptive AI-Based Risk-Aware Key Rotation Framework
 
+[![Live Demo](https://img.shields.io/badge/Render-Live%20Demo-46E3B7.svg?style=for-the-badge&logo=render&logoColor=white)](https://adaptive-ai-key-rotation.onrender.com)
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue.svg?style=for-the-badge&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688.svg?style=for-the-badge&logo=fastapi&logoColor=white)
 ![Encryption](https://img.shields.io/badge/Cipher-ChaCha20--Poly1305-blueviolet.svg?style=for-the-badge&logo=letsencrypt&logoColor=white)
 ![ML Model](https://img.shields.io/badge/Model-Random%20Forest%20Regressor-brightgreen.svg?style=for-the-badge&logo=scikit-learn&logoColor=white)
 
-An enterprise-grade, intelligent cryptographic file storage framework. Traditional systems rotate encryption keys on rigid calendar schedules (e.g., every 30–90 days). This framework continuously computes multi-factor exposure risk using an integrated **Random Forest Machine Learning model** and orchestrates **automatic key rotation and file re-encryption** dynamically the moment risk exceeds defined security thresholds.
+An enterprise-grade, intelligent cryptographic file storage framework inspired by **Google Drive / Google Workspace**. Traditional systems rotate encryption keys on rigid calendar schedules (e.g., every 30–90 days). This framework continuously computes multi-factor exposure risk using an integrated **Random Forest Machine Learning model** and orchestrates **automatic key rotation and file re-encryption** dynamically the moment risk exceeds defined security thresholds.
+
+---
+
+## 🌐 Live Cloud Deployment
+
+The application is deployed live on Render:
+
+🔗 **[https://adaptive-ai-key-rotation.onrender.com](https://adaptive-ai-key-rotation.onrender.com)**
+
+*(Note: Free tier instances on Render automatically spin down during inactivity and take ~30 seconds to wake up on initial request).*
 
 ---
 
 ## 🎯 Key Highlights
 
+*   **Google Drive UI/UX Design System**: Complete Google Workspace visual experience—top navigation bar, center Omni search bar with real-time filtering, left sidebar with authentic Material "+ New Upload" floating action button (FAB), and color-coded file icons.
 *   **Adaptive Key Rotation**: Keys rotate autonomously when threat conditions demand it, optimizing both security and computational overhead.
 *   **Modern Authenticated Encryption**: Implements **ChaCha20-Poly1305 AEAD** (256-bit key, 96-bit nonce) offering robust integrity and confidentiality.
 *   **Predictive Risk Modeling**: Evaluates file type sensitivity, data volume exposure, file age, and key aging using a trained Random Forest ML Engine (trained on 6,000 samples; MAE ≈ 3.3, R² ≈ 0.94).
+*   **Continuous Dynamic Age & Exposure Metrics**: Measures payload size (+3 to +10 data exposure) and dynamic age progression continuously in hours and days (starting at active baseline +0.5).
 *   **Autonomous Monitoring**: Built-in APScheduler constantly surveys assets in the background, executing seamless rotations without manual intervention.
 *   **State-Machine Rotation Control**: Enforces single-rotation transitions ($v_1 \rightarrow v_2$) for sustained threats, eliminating infinite re-encryption loops.
 *   **Active Post-Rotation Mitigation**: Automatically recalculates risk with fresh active keys, instantly reducing the risk score (e.g., from 43 to 27 / LOW) upon mitigation.
@@ -33,7 +46,7 @@ python -m venv venv
 venv\Scripts\activate      # Linux/macOS: source venv/bin/activate
 
 # Install dependencies
-pip install -r requirements.txt -r requirements-ml.txt
+pip install -r requirements.txt
 ```
 
 ### 2. Run Application
@@ -116,7 +129,10 @@ adaptive-ai-key-rotation/
 ├── app.py                     # FastAPI application, auth, file routes & API
 ├── rotation.py                # State-machine rotation orchestration & monitoring
 ├── config.py                  # Cryptographic & scheduler configurations
-├── database.py                # SQLAlchemy SQLite session manager
+├── database.py                # SQLAlchemy session manager (SQLite / PostgreSQL)
+├── requirements.txt           # Production & ML dependencies
+├── render.yaml                # Render Blueprint configuration for 1-click cloud deployment
+├── Procfile                   # Cloud process manager start command
 │
 ├── ai/
 │   ├── risk_engine.py         # Unified risk scoring interface & baseline engine
