@@ -78,7 +78,6 @@
         <th>Risk Level</th>
         <th>Risk Score</th>
         <th>Size</th>
-        <th>Accesses</th>
         <th style="text-align: right;">Actions</th>
       </tr>
     </thead>
@@ -139,9 +138,6 @@
         </td>
         <td>
           <span style="color: var(--gd-text-secondary);">{{ (file.file_size / 1024)|round|int }} KB</span>
-        </td>
-        <td>
-          <span style="color: var(--gd-text-secondary);">{{ file.download_count or 0 }}</span>
         </td>
         <td>
           <div class="gd-table-actions">
