@@ -167,18 +167,6 @@
             <td>Key Age Risk</td>
             <td style="text-align: right; font-weight: 500;">+{{ "%.1f"|format(breakdown.key_age_risk) }}</td>
           </tr>
-          <tr>
-            <td>Access Frequency Risk</td>
-            <td style="text-align: right; font-weight: 500;">+{{ "%.0f"|format(breakdown.access_risk) }}</td>
-          </tr>
-          <tr>
-            <td>Account Failed Login Risk</td>
-            <td style="text-align: right; font-weight: 500;">+{{ "%.0f"|format(breakdown.failed_login_risk) }}</td>
-          </tr>
-          <tr>
-            <td>Temporal Anomaly Risk</td>
-            <td style="text-align: right; font-weight: 500;">+{{ "%.0f"|format(breakdown.time_risk) }}</td>
-          </tr>
           {% if breakdown.rotation_mitigation > 0 %}
           <tr>
             <td style="color: var(--gd-green); font-weight: 500;">Active Cryptographic Mitigation (Fresh Key)</td>

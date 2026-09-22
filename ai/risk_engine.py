@@ -29,9 +29,6 @@ class RiskBreakdown:
     file_size_risk: float = 0.0
     age_risk: float = 0.0
     key_age_risk: float = 0.0
-    access_risk: float = 0.0
-    failed_login_risk: float = 0.0
-    time_risk: float = 0.0
     rotation_mitigation: float = 0.0
     total: float = 0.0
     level: str = "LOW"
@@ -47,9 +44,6 @@ class RiskBreakdown:
             "file_size_risk": round(self.file_size_risk, 2),
             "age_risk": round(self.age_risk, 2),
             "key_age_risk": round(self.key_age_risk, 2),
-            "access_risk": round(self.access_risk, 2),
-            "failed_login_risk": round(self.failed_login_risk, 2),
-            "time_risk": round(self.time_risk, 2),
             "rotation_mitigation": round(self.rotation_mitigation, 2),
             "total": round(self.total, 2),
             "level": self.level,
@@ -119,32 +113,13 @@ class RuleBasedRiskEngine:
         else:
             key_age_risk = min(w["key_age_risk_cap"], round(key_age_days * w["key_age_risk_per_day"], 1))
 
-        # 6. Access risk
-        download_count = file_record.download_count or 0
-        access_risk = min(download_count * w["access_risk_per_download"], w["access_risk_cap"])
-        if download_count > 5:
-            explanations.append("High file access frequency")
-
-        # 7. Failed login attempts
-        failed_logins = file_record.owner.failed_login_attempts if file_record.owner else 0
-        failed_login_risk = min(failed_logins * 10.0, 30.0)
-        if failed_logins > 0:
-            explanations.append("Multiple failed logins detected on owner account")
-
-        # 8. Unusual access time (e.g., outside 6 AM - 11 PM local time)
-        local_hour = datetime.datetime.now().hour
-        time_risk = 0.0
-        if local_hour < 6 or local_hour >= 23:
-            time_risk = 15.0
-            explanations.append("Unusual access time (outside business hours)")
-
         # 9. Cryptographic Rotation Mitigation
         rotation_mitigation = 0.0
         if key_record is not None and getattr(key_record, "version", 1) > 1:
             rotation_mitigation = max(0.0, 15.0 - (key_age_days * 1.5))
             explanations.append(f"Key rotated to v{key_record.version}: threat mitigated (-{rotation_mitigation:.0f} risk)")
 
-        total = encryption_risk + file_type_risk + file_size_risk + age_risk + key_age_risk + access_risk + failed_login_risk + time_risk - rotation_mitigation
+        total = encryption_risk + file_type_risk + file_size_risk + age_risk + key_age_risk - rotation_mitigation
         total = max(0.0, min(total, 100.0))
 
         level = _level_for(total)
@@ -163,9 +138,6 @@ class RuleBasedRiskEngine:
             file_size_risk=file_size_risk,
             age_risk=age_risk,
             key_age_risk=key_age_risk,
-            access_risk=access_risk,
-            failed_login_risk=failed_login_risk,
-            time_risk=time_risk,
             rotation_mitigation=rotation_mitigation,
             total=total,
             level=level,

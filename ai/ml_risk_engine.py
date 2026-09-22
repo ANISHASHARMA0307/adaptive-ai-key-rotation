@@ -95,16 +95,6 @@ class MLRiskEngine:
 
         predicted = float(self.model.predict([features])[0])
         predicted = max(0.0, min(100.0, predicted))
-        # 6. Failed login attempts
-        failed_logins = file_record.owner.failed_login_attempts if file_record.owner else 0
-        failed_login_risk = min(failed_logins * 10.0, 30.0)
-        
-        # 7. Unusual access time (e.g., outside 6 AM - 11 PM local time)
-        local_hour = datetime.datetime.now().hour
-        time_risk = 0.0
-        if local_hour < 6 or local_hour >= 23:
-            time_risk = 15.0
-
         # 8. Cryptographic Rotation Mitigation:
         # When a key is rotated (v2, v3, etc.), active threat mitigation takes effect.
         # Freshly rotated keys receive up to -15 points mitigation credit that decays as the key ages.
@@ -113,7 +103,7 @@ class MLRiskEngine:
             rotation_mitigation = max(0.0, 15.0 - (key_age_days * 1.5))
 
         # Combine Random Forest ML prediction with active context & rotation mitigation
-        adjusted_predicted = min(100.0, max(0.0, predicted + failed_login_risk + time_risk - rotation_mitigation))
+        adjusted_predicted = min(100.0, max(0.0, predicted - rotation_mitigation))
         level = _level_for(adjusted_predicted)
         
         explanations = []
@@ -125,15 +115,6 @@ class MLRiskEngine:
 
         if file_type_risk_level(file_record.file_type) > 1:
             explanations.append("Sensitive file type accessed")
-
-        if download_count > 5:
-            explanations.append("High file access frequency")
-
-        if failed_logins > 0:
-            explanations.append("Multiple failed logins detected on owner account")
-
-        if time_risk > 0:
-            explanations.append("Unusual access time (outside business hours)")
 
         if adjusted_predicted > RISK_THRESHOLD:
             explanations.append(
@@ -151,9 +132,6 @@ class MLRiskEngine:
             file_size_risk=file_size_risk,
             age_risk=age_risk,
             key_age_risk=key_age_risk,
-            access_risk=min(download_count * 3.0, 15.0),
-            failed_login_risk=failed_login_risk,
-            time_risk=time_risk,
             rotation_mitigation=rotation_mitigation,
             total=adjusted_predicted,
             level=level,

@@ -44,8 +44,6 @@ RISK_WEIGHTS = {
     "age_risk_cap": 25,
     "key_age_risk_per_day": 1.5,  
     "key_age_risk_cap": 30,
-    "access_risk_per_download": 5,  # Increased from 3 to 5 to trigger risk faster
-    "access_risk_cap": 25,
 }
 
 # session secret (demo only — in production load from env/secret manager)

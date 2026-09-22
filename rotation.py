@@ -62,8 +62,7 @@ def analyze_risk(
                 f"encryption={breakdown.encryption_risk}, "
                 f"file_type={breakdown.file_type_risk}, "
                 f"age={breakdown.age_risk}, "
-                f"key_age={breakdown.key_age_risk}, "
-                f"access={breakdown.access_risk} "
+                f"key_age={breakdown.key_age_risk} "
                 f"-> total={breakdown.total:.2f} ({breakdown.level})"
             ),
         )
