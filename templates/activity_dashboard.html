@@ -27,24 +27,24 @@
   <div class="gd-empty-text">No security activity logged yet.</div>
 </div>
 {% else %}
-<div class="gd-table-container">
-  <table class="gd-file-table">
+<div class="gd-table-container" style="overflow-x: auto;">
+  <table class="gd-file-table gd-activity-table" style="min-width: 900px;">
     <thead>
       <tr>
-        <th style="width: 180px;">Timestamp</th>
-        <th style="width: 160px;">Event Action</th>
-        <th>File Asset</th>
-        <th style="width: 110px;">Risk Score</th>
-        <th>Audit Details</th>
+        <th style="width: 170px; min-width: 165px; white-space: nowrap;">Timestamp</th>
+        <th style="width: 160px; min-width: 150px; white-space: nowrap;">Event Action</th>
+        <th style="width: 220px; min-width: 180px; max-width: 260px;">File Asset</th>
+        <th style="width: 105px; min-width: 95px; text-align: center; white-space: nowrap;">Risk Score</th>
+        <th style="min-width: 380px; width: 50%;">Audit Details</th>
       </tr>
     </thead>
     <tbody>
       {% for log in logs %}
       <tr>
-        <td style="color: var(--gd-text-muted); font-size: 13px;">
+        <td style="color: var(--gd-text-muted); font-size: 13px; white-space: nowrap;">
           {{ log.created_at.strftime("%Y-%m-%d %H:%M:%S") }}
         </td>
-        <td>
+        <td style="white-space: nowrap;">
           <span class="gd-pill 
             {% if log.action in ['KEY_ROTATION', 'RE_ENCRYPTION'] %}gd-pill-version
             {% elif log.action == 'FAILED_LOGIN' %}gd-pill-high
@@ -53,21 +53,21 @@
             {{ log.action }}
           </span>
         </td>
-        <td>
+        <td style="max-width: 260px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
           {% if log.file %}
-          <a href="/file/{{ log.file_id }}" class="gd-file-name-link">{{ log.file.original_filename }}</a>
+          <a href="/file/{{ log.file_id }}" class="gd-file-name-link" title="{{ log.file.original_filename }}">{{ log.file.original_filename }}</a>
           {% else %}
           <span style="color: var(--gd-text-muted);">&mdash;</span>
           {% endif %}
         </td>
-        <td>
+        <td style="text-align: center; white-space: nowrap;">
           {% if log.risk_score is not none %}
           <strong>{{ "%.0f"|format(log.risk_score) }}</strong> <span style="font-size: 11px; color: var(--gd-text-muted);">/ 100</span>
           {% else %}
           <span style="color: var(--gd-text-muted);">&mdash;</span>
           {% endif %}
         </td>
-        <td style="color: var(--gd-text-secondary); word-break: break-all;">
+        <td style="color: var(--gd-text); font-size: 13.5px; line-height: 1.55; overflow-wrap: break-word; word-break: normal; padding-right: 24px;">
           {{ log.details or "" }}
         </td>
       </tr>

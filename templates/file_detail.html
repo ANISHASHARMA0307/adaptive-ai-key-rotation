@@ -337,7 +337,7 @@
             </span>
             <span style="font-size: 11px; color: var(--gd-text-muted);">{{ log.created_at.strftime("%H:%M:%S") }}</span>
           </div>
-          <div style="color: var(--gd-text-secondary); word-break: break-all; font-size: 12px;">
+          <div style="color: var(--gd-text); word-break: normal; overflow-wrap: break-word; font-size: 12.5px; line-height: 1.45; margin-top: 4px;">
             {{ log.details or "" }}
           </div>
           {% if log.risk_score is not none %}
